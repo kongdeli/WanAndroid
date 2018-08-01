@@ -1,6 +1,7 @@
 package dev.kongdeli.wanandroid;
 
 import android.app.TimePickerDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TimePicker;
@@ -14,6 +15,12 @@ public class MainActivity extends BaseActivity implements TimePickerDialog.OnTim
 
     @BindView(R.id.bt_show_time_picker)
     Button mBtShow;
+    private TimePickerDialog mDialog;
+
+    @Override
+    protected void initView() {
+        mDialog = new TimePickerDialog(this, this, 0, 0, true);
+    }
 
     @Override
     protected void initData() {
@@ -33,8 +40,11 @@ public class MainActivity extends BaseActivity implements TimePickerDialog.OnTim
                 Calendar calendar = Calendar.getInstance();
                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                 int minute = calendar.get(Calendar.MINUTE);
-                TimePickerDialog dialog = new TimePickerDialog(this, this, hour, minute, true);
-                dialog.show();
+                int s = calendar.get(Calendar.SECOND);
+                int num = (int) (Math.random() * 60);
+                Log.d("random_num", "onClick: " + num + "..." + hour + "..." + minute);
+                mDialog.updateTime(hour, s);
+                mDialog.show();
                 break;
         }
     }

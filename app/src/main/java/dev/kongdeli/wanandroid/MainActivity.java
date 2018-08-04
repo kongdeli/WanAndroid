@@ -1,25 +1,33 @@
 package dev.kongdeli.wanandroid;
 
 import android.app.TimePickerDialog;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TimePicker;
-
-import java.util.Calendar;
+import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import butterknife.BindView;
-import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity implements TimePickerDialog.OnTimeSetListener {
+public class MainActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,
+        NavHelper.OnTabChangeListener {
 
-    @BindView(R.id.bt_show_time_picker)
-    Button mBtShow;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    @BindView(R.id.bottom_nav)
+    BottomNavigationView mBottomNav;
+    @BindView(R.id.fl_container)
+    FrameLayout mFlContainer;
     private TimePickerDialog mDialog;
+    private NavHelper mNavHelper;
 
     @Override
     protected void initView() {
-        mDialog = new TimePickerDialog(this, this, 0, 0, true);
+        mNavHelper = new NavHelper(this, getSupportFragmentManager(), R.id.fl_container, this);
+        mNavHelper.add(R.id.menu_home, new NavHelper.Tab(HomeFragment.class, R.string.fg_home_title))
+                .add(R.id.menu_hot, new NavHelper.Tab(HotFragment.class, R.string.fg_hot_title))
+                .add(R.id.menu_center, new NavHelper.Tab(UserCenterFragment.class, R.string.fg_user_center_title));
+        mBottomNav.setOnNavigationItemSelectedListener(this);
+        mBottomNav.getMenu().performIdentifierAction(R.id.menu_home, 0);
     }
 
     @Override
@@ -32,25 +40,15 @@ public class MainActivity extends BaseActivity implements TimePickerDialog.OnTim
         return R.layout.activity_main;
     }
 
-    @OnClick({R.id.bt_show_time_picker})
+
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.bt_show_time_picker:
-                Calendar calendar = Calendar.getInstance();
-                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                int minute = calendar.get(Calendar.MINUTE);
-                int s = calendar.get(Calendar.SECOND);
-                int num = (int) (Math.random() * 60);
-                Log.d("random_num", "onClick: " + num + "..." + hour + "..." + minute);
-                mDialog.updateTime(hour, s);
-                mDialog.show();
-                break;
-        }
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return mNavHelper.performClickMenu(item.getItemId());
     }
 
     @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
+    public void onTabChange(NavHelper.Tab newTab, NavHelper.Tab oldTab) {
+        Log.d(TAG, "onTabChange: " + getString((Integer) newTab.extra));
+        setTitle((Integer) newTab.extra);
     }
 }

@@ -3,6 +3,7 @@ package dev.kongdeli.wanandroid;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -29,14 +30,15 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
+        setSupportActionBar(mToolbar);
         setContentView(getLayoutId());
         mUnBinder = ButterKnife.bind(this);
 //        mTvTitle.setText(getTitle());
-        setSupportActionBar(mToolbar);
         setBackIcon();
         initView();
         initData();
     }
+
 
     protected abstract void initView();
 
@@ -55,7 +57,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     public void setContentView(@LayoutRes int layoutResId) {
         if (R.layout.activity_base == layoutResId) {
             super.setContentView(layoutResId);
-            mFlContent = findViewById(R.id.fl_content);
+            mFlContent = findViewById(R.id.fl_container);
             mFlContent.removeAllViews();
         } else {
             View content = LayoutInflater.from(this).inflate(layoutResId, null);
@@ -73,5 +75,9 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View v) {
 
+    }
+
+    public void setTitle(@StringRes int title) {
+        mToolbar.setTitle(title);
     }
 }

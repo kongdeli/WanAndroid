@@ -3,4 +3,8 @@
     <string name="home">首页</string>
     <string name="hot">热门</string>
     <string name="account">我的</string>
+    <string name="show">show</string>
+    <string name="fg_home_title">首页</string>
+    <string name="fg_hot_title">热门</string>
+    <string name="fg_user_center_title">用户设置</string>
 </resources>

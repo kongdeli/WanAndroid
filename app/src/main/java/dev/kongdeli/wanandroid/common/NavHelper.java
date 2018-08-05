@@ -1,4 +1,4 @@
-package dev.kongdeli.wanandroid;
+package dev.kongdeli.wanandroid.common;
 
 import android.content.Context;
 import android.support.annotation.IdRes;
@@ -8,13 +8,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.util.SparseArray;
 
-public class NavHelper<T> {
+public class NavHelper {
     private static final String TAG = NavHelper.class.getSimpleName();
-    private SparseArray<Tab<T>> mTabs = new SparseArray<>();
+    private SparseArray<Tab> mTabs = new SparseArray<>();
     private final Context mContext;
     private final FragmentManager mFragManager;
     private final int mContainerId;
-    private Tab<T> mCurrentTab;
+    private Tab mCurrentTab;
     private OnTabChangeListener mTabChangeListener;
 
     public NavHelper(Context context, FragmentManager fm, @IdRes int containerId, OnTabChangeListener listener) {
@@ -24,29 +24,31 @@ public class NavHelper<T> {
         this.mTabChangeListener = listener;
     }
 
-    public NavHelper<T> add(int menuId, Tab<T> tab) {
+    public NavHelper add(int menuId, Tab tab) {
         mTabs.put(menuId, tab);
         Log.d(TAG, "add: " + mTabs.toString());
         return this;
     }
 
-    public static class Tab<T> {
+    public static class Tab {
         private final Class<?> clazz;
-        public final T extra;
+        public int extra;
         public Fragment fragment;
 
-        public Tab(Class<?> clazz, T extra) {
+        public Tab(Class<?> clazz, int extra) {
             this.clazz = clazz;
             this.extra = extra;
         }
     }
 
-    public interface OnTabChangeListener<T> {
-        void onTabChange(Tab<T> newTab, Tab<T> oldTab);
+    public interface OnTabChangeListener {
+        void onTabChange(Tab newTab, Tab oldTab);
+
+        void onTabReSelect(Tab tab);
     }
 
     public boolean performClickMenu(int itemId) {
-        Tab<T> tab = mTabs.get(itemId);
+        Tab tab = mTabs.get(itemId);
         if (tab != null) {
             doSelect(tab);
             return true;
@@ -54,8 +56,8 @@ public class NavHelper<T> {
         return false;
     }
 
-    private void doSelect(Tab<T> tab) {
-        Tab<T> oldTab = null;
+    private void doSelect(Tab tab) {
+        Tab oldTab = null;
         if (mCurrentTab != null) {
             oldTab = mCurrentTab;
             if (oldTab == tab) {
@@ -67,7 +69,7 @@ public class NavHelper<T> {
         doTabChange(mCurrentTab, oldTab);
     }
 
-    private void doTabChange(Tab<T> newTab, Tab<T> oldTab) {
+    private void doTabChange(Tab newTab, Tab oldTab) {
         FragmentTransaction ft = mFragManager.beginTransaction();
         if (oldTab != null) {
             if (oldTab.fragment != null) {
@@ -86,13 +88,15 @@ public class NavHelper<T> {
         notifySelected(newTab, oldTab);
     }
 
-    private void notifySelected(Tab<T> newTab, Tab<T> oldTab) {
+    private void notifySelected(Tab newTab, Tab oldTab) {
         if (mTabChangeListener != null) {
             mTabChangeListener.onTabChange(newTab, oldTab);
         }
     }
 
-    private void notifyReselected(Tab<T> tab) {
-
+    private void notifyReselected(Tab tab) {
+        if(mTabChangeListener!=null) {
+            mTabChangeListener.onTabReSelect(tab);
+        }
     }
 }
